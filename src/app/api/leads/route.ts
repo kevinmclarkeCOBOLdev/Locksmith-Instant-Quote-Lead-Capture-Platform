@@ -21,7 +21,7 @@ export async function GET(req: Request) {
       .orderBy(desc(leads.createdAt));
 
     // Map into flat structure
-    const formatted = results.map(row => ({
+    const formatted = results.map((row: any) => ({
       ...row.lead,
       quote: row.quote ? {
         id: row.quote.id,

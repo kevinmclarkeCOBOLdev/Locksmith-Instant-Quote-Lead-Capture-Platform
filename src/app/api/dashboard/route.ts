@@ -80,7 +80,7 @@ export async function GET(req: Request) {
       .orderBy(sql`extract(month from ${leads.createdAt})`);
 
     // Ensure chart formatting
-    const formattedChartData = monthlyData.map(item => ({
+    const formattedChartData = monthlyData.map((item: any) => ({
       name: item.month,
       Leads: item.count
     }));
