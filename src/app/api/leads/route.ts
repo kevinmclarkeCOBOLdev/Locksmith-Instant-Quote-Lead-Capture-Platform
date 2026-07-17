@@ -3,13 +3,32 @@ import { db } from '@/db';
 import { leads, quotes } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { DEFAULT_TENANT_ID } from '@/db/helpers';
+import { ConvexHttpClient } from 'convex/browser';
+import { api } from '@/../convex/_generated/api';
+
+const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+const convex = convexUrl ? new ConvexHttpClient(convexUrl) : null;
 
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const tenantId = searchParams.get('tenantId') || DEFAULT_TENANT_ID;
+    const tenantIdParam = searchParams.get('tenantId');
 
-    // Fetch leads and left-join quotes
+    if (convex) {
+      // Find default tenant if no id passed
+      const tenantData = await convex.mutation(api.tenants.getOrCreateDefaultTenant, {});
+      const tenantId = tenantIdParam || (tenantData as any)?._id;
+
+      const leadsList = await convex.query(api.leads.getLeads, { tenantId: tenantId as any });
+      return NextResponse.json({
+        success: true,
+        leads: leadsList
+      });
+    }
+
+    const tenantId = tenantIdParam || DEFAULT_TENANT_ID;
+
+    // Fetch leads and left-join quotes (Drizzle)
     const results = await db
       .select({
         lead: leads,

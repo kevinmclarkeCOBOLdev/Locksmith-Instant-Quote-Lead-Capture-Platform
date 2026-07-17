@@ -4,9 +4,14 @@ import { tenants } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { getOrCreateDefaultTenant, DEFAULT_QUOTE_RULES } from '@/db/helpers';
 import { z } from 'zod';
+import { ConvexHttpClient } from 'convex/browser';
+import { api } from '@/../convex/_generated/api';
+
+const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+const convex = convexUrl ? new ConvexHttpClient(convexUrl) : null;
 
 const quoteSchema = z.object({
-  tenantId: z.string().uuid().optional(),
+  tenantId: z.string().optional(),
   serviceType: z.string(),
   propertyType: z.string(),
   urgency: z.string(),
@@ -25,13 +30,22 @@ export async function POST(req: Request) {
     }
 
     const { tenantId, serviceType, propertyType, urgency } = result.data;
-    const tid = tenantId || (await getOrCreateDefaultTenant()).id;
 
-    // Fetch tenant rules
-    const tenantList = await db.select().from(tenants).where(eq(tenants.id, tid));
-    const tenantData = tenantList[0] || (await getOrCreateDefaultTenant());
+    let quoteRules = DEFAULT_QUOTE_RULES;
 
-    const quoteRules = (tenantData.quoteRules as typeof DEFAULT_QUOTE_RULES) || DEFAULT_QUOTE_RULES;
+    if (convex) {
+      // In Convex, get default tenant settings
+      const tenantData = await convex.mutation(api.tenants.getOrCreateDefaultTenant, {});
+      if (tenantData && (tenantData as any).quoteRules) {
+        quoteRules = (tenantData as any).quoteRules;
+      }
+    } else {
+      const tid = tenantId || (await getOrCreateDefaultTenant()).id;
+      // Fetch tenant rules
+      const tenantList = await db.select().from(tenants).where(eq(tenants.id, tid));
+      const tenantData = tenantList[0] || (await getOrCreateDefaultTenant());
+      quoteRules = (tenantData.quoteRules as typeof DEFAULT_QUOTE_RULES) || DEFAULT_QUOTE_RULES;
+    }
 
     // Extract base pricing
     const basePrice = quoteRules.pricing[serviceType] || { min: 70, max: 120 };

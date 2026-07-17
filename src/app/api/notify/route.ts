@@ -6,10 +6,15 @@ import { getOrCreateDefaultTenant, DEFAULT_EMAIL_TEMPLATES, DEFAULT_SMS_TEMPLATE
 import { emailProvider } from '@/services/email';
 import { smsProvider } from '@/services/sms';
 import { z } from 'zod';
+import { ConvexHttpClient } from 'convex/browser';
+import { api } from '@/../convex/_generated/api';
+
+const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+const convex = convexUrl ? new ConvexHttpClient(convexUrl) : null;
 
 const notifySchema = z.object({
-  tenantId: z.string().uuid(),
-  leadId: z.string().uuid(),
+  tenantId: z.string(),
+  leadId: z.string(),
   minPrice: z.number(),
   maxPrice: z.number(),
 });
@@ -37,14 +42,106 @@ export async function POST(req: Request) {
 
     const { tenantId, leadId, minPrice, maxPrice } = result.data;
 
-    // 1. Fetch Lead
+    if (convex) {
+      // 1. Fetch Lead (Convex)
+      const lead = await convex.query(api.leads.getLeadById, { leadId: leadId as any });
+      if (!lead) {
+        return NextResponse.json({ success: false, error: 'Lead not found' }, { status: 404 });
+      }
+
+      // 2. Fetch Tenant settings (Convex)
+      const tenant = await convex.mutation(api.tenants.getOrCreateDefaultTenant, {});
+      if (!tenant) throw new Error('Tenant not found');
+
+      const l = lead as any;
+      const t = tenant as any;
+
+      const notifSettings = t.notificationSettings || DEFAULT_NOTIFICATION_SETTINGS;
+      const emailTemplates = t.emailTemplates || DEFAULT_EMAIL_TEMPLATES;
+      const smsTemplates = t.smsTemplates || DEFAULT_SMS_TEMPLATES;
+
+      const variables = {
+        name: l.name,
+        phone: l.phone,
+        email: l.email,
+        postcode: l.postcode,
+        serviceType: l.serviceType,
+        propertyType: l.propertyType,
+        urgency: l.urgency,
+        message: l.message || 'No details provided.',
+        minPrice,
+        maxPrice,
+      };
+
+      const notificationRecords: any[] = [];
+
+      // 3. Send Email
+      if (notifSettings.emailEnabled && t.businessEmail) {
+        const emailHtml = renderTemplate(emailTemplates.leadNotification, variables);
+        const emailRes = await emailProvider.sendEmail({
+          to: t.businessEmail,
+          subject: `New Lead - ${l.name} (${l.serviceType})`,
+          html: emailHtml,
+        });
+
+        const newNotifId = await convex.mutation(api.notifications.createNotification, {
+          tenantId: t._id,
+          leadId: l.id as any,
+          channel: 'email',
+          status: emailRes.success ? 'sent' : 'failed',
+        });
+        notificationRecords.push({ id: newNotifId, channel: 'email', status: emailRes.success ? 'sent' : 'failed' });
+      }
+
+      // 4. Send SMS
+      if (notifSettings.smsEnabled && t.businessPhone) {
+        const smsBody = renderTemplate(smsTemplates.leadNotification, variables);
+        const smsRes = await smsProvider.sendSMS({
+          to: t.businessPhone,
+          body: smsBody,
+        });
+
+        const newNotifId = await convex.mutation(api.notifications.createNotification, {
+          tenantId: t._id,
+          leadId: l.id as any,
+          channel: 'sms',
+          status: smsRes.success ? 'sent' : 'failed',
+        });
+        notificationRecords.push({ id: newNotifId, channel: 'sms', status: smsRes.success ? 'sent' : 'failed' });
+      }
+
+      // 5. Realtime Notification log
+      if (notifSettings.dashboardEnabled) {
+        const newNotifId = await convex.mutation(api.notifications.createNotification, {
+          tenantId: t._id,
+          leadId: l.id as any,
+          channel: 'realtime',
+          status: 'sent',
+        });
+        notificationRecords.push({ id: newNotifId, channel: 'realtime', status: 'sent' });
+      }
+
+      // Log to audit logs
+      await convex.mutation(api.auditLogs.createAuditLog, {
+        tenantId: t._id,
+        event: 'Notifications Dispatched',
+        metadata: { leadId, count: notificationRecords.length },
+      });
+
+      return NextResponse.json({
+        success: true,
+        notifications: notificationRecords,
+      });
+    }
+
+    // 1. Fetch Lead (Drizzle)
     const leadList = await db.select().from(leads).where(eq(leads.id, leadId));
     const lead = leadList[0];
     if (!lead) {
       return NextResponse.json({ success: false, error: 'Lead not found' }, { status: 404 });
     }
 
-    // 2. Fetch Tenant settings
+    // 2. Fetch Tenant settings (Drizzle)
     const tenantList = await db.select().from(tenants).where(eq(tenants.id, tenantId));
     const tenant = tenantList[0] || (await getOrCreateDefaultTenant());
 

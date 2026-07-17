@@ -5,9 +5,14 @@ import { getOrCreateDefaultTenant, DEFAULT_QUOTE_RULES } from '@/db/helpers';
 import { eq } from 'drizzle-orm';
 import { tenants } from '@/db/schema';
 import { z } from 'zod';
+import { ConvexHttpClient } from 'convex/browser';
+import { api } from '@/../convex/_generated/api';
+
+const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+const convex = convexUrl ? new ConvexHttpClient(convexUrl) : null;
 
 const leadSchema = z.object({
-  tenantId: z.string().uuid().optional(),
+  tenantId: z.string().optional(),
   name: z.string(),
   phone: z.string(),
   email: z.string().email(),
@@ -56,12 +61,104 @@ export async function POST(req: Request) {
     }
 
     const data = result.data;
-    const tid = data.tenantId || (await getOrCreateDefaultTenant()).id;
 
     // 1. Geocode
     const { lat, lng } = await geocodePostcode(data.postcode);
 
-    // 2. Fetch tenant & calculate quote
+    if (convex) {
+      // 2. Fetch tenant & calculate quote
+      const tenantData = await convex.mutation(api.tenants.getOrCreateDefaultTenant, {});
+      if (!tenantData) throw new Error('Tenant could not be initialized');
+
+      const tid = (tenantData as any)._id;
+      const quoteRules = (tenantData as any).quoteRules || DEFAULT_QUOTE_RULES;
+
+      const basePrice = quoteRules.pricing[data.serviceType] || { min: 70, max: 120 };
+      const propMultiplier = quoteRules.multipliers?.property?.[data.propertyType] ?? 1.0;
+      const urgencyMultiplier = quoteRules.multipliers?.urgency?.[data.urgency] ?? 1.0;
+
+      const minPrice = Math.round(basePrice.min * propMultiplier * urgencyMultiplier);
+      const maxPrice = Math.round(basePrice.max * propMultiplier * urgencyMultiplier);
+
+      // 3. Insert lead
+      const newLeadId = await convex.mutation(api.leads.createLead, {
+        tenantId: tid,
+        name: data.name,
+        phone: data.phone,
+        email: data.email,
+        postcode: data.postcode,
+        lat: lat || undefined,
+        lng: lng || undefined,
+        serviceType: data.serviceType,
+        propertyType: data.propertyType,
+        urgency: data.urgency,
+        message: data.message,
+      });
+
+      // 4. Insert quote
+      const newQuoteId = await convex.mutation(api.quotes.createQuote, {
+        tenantId: tid,
+        leadId: newLeadId,
+        minPrice,
+        maxPrice,
+        quoteType: 'instant',
+      });
+
+      // 5. Create audit log
+      await convex.mutation(api.auditLogs.createAuditLog, {
+        tenantId: tid,
+        event: 'Lead Created',
+        metadata: { leadId: newLeadId, quoteId: newQuoteId, name: data.name },
+      });
+
+      // 6. Trigger notifications (Call notify route internally)
+      try {
+        const origin = new URL(req.url).origin;
+        await fetch(`${origin}/api/notify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tenantId: tid,
+            leadId: newLeadId,
+            minPrice,
+            maxPrice,
+          }),
+        });
+      } catch (notifyErr) {
+        console.error('Async notify triggers failed:', notifyErr);
+      }
+
+      return NextResponse.json({
+        success: true,
+        lead: {
+          id: newLeadId,
+          tenantId: tid,
+          name: data.name,
+          phone: data.phone,
+          email: data.email,
+          postcode: data.postcode,
+          lat,
+          lng,
+          serviceType: data.serviceType,
+          propertyType: data.propertyType,
+          urgency: data.urgency,
+          message: data.message || null,
+          status: 'new',
+        },
+        quote: {
+          id: newQuoteId,
+          tenantId: tid,
+          leadId: newLeadId,
+          minPrice,
+          maxPrice,
+          quoteType: 'instant',
+        },
+      });
+    }
+
+    const tid = data.tenantId || (await getOrCreateDefaultTenant()).id;
+
+    // 2. Fetch tenant & calculate quote (Drizzle)
     const tenantList = await db.select().from(tenants).where(eq(tenants.id, tid));
     const tenantData = tenantList[0] || (await getOrCreateDefaultTenant());
     const quoteRules = (tenantData.quoteRules as typeof DEFAULT_QUOTE_RULES) || DEFAULT_QUOTE_RULES;
