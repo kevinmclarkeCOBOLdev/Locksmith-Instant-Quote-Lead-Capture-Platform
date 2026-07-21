@@ -13,6 +13,7 @@ import type * as constants from "../constants.js";
 import type * as leads from "../leads.js";
 import type * as notifications from "../notifications.js";
 import type * as quotes from "../quotes.js";
+import type * as seed from "../seed.js";
 import type * as tenants from "../tenants.js";
 
 import type {
@@ -27,6 +28,7 @@ declare const fullApi: ApiFromModules<{
   leads: typeof leads;
   notifications: typeof notifications;
   quotes: typeof quotes;
+  seed: typeof seed;
   tenants: typeof tenants;
 }>;
 
