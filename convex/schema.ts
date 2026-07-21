@@ -18,6 +18,7 @@ export default defineSchema({
     tenantId: v.id('tenants'),
     email: v.string(),
     authUserId: v.string(),
+    password: v.optional(v.string()),
   }).index('by_authUserId', ['authUserId']),
 
   leads: defineTable({

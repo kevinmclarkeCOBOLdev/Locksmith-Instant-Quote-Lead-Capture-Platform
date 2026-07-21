@@ -2,8 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, FileText, Settings, Shield } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { LayoutDashboard, Users, FileText, Settings, Shield, LogOut } from 'lucide-react';
 
 interface SidebarLinkProps {
   href: string;
@@ -31,6 +31,18 @@ function SidebarLink({ href, icon, children }: SidebarLinkProps) {
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      router.push('/login');
+      router.refresh();
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-slate-950 text-slate-100 font-sans">
       {/* Sidebar */}
@@ -64,18 +76,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </nav>
         </div>
 
-        {/* Footer info */}
+        {/* Footer info with Logout */}
         <div className="p-6 border-t border-slate-900/80 bg-slate-900/10">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center font-bold text-slate-400 text-xs">
-              AL
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center font-bold text-slate-400 text-xs">
+                AL
+              </div>
+              <div>
+                <p className="text-xs font-bold text-white leading-tight">Atypikal Locksmith</p>
+                <span className="text-[10px] text-slate-500 flex items-center gap-1">
+                  <Shield size={10} className="text-emerald-500" /> Multi-Tenant
+                </span>
+              </div>
             </div>
-            <div>
-              <p className="text-xs font-bold text-white leading-tight">Atypikal Locksmith</p>
-              <span className="text-[10px] text-slate-500 flex items-center gap-1">
-                <Shield size={10} className="text-emerald-500" /> Multi-Tenant SaaS
-              </span>
-            </div>
+            <button
+              onClick={handleLogout}
+              className="p-2 text-slate-500 hover:text-rose-400 hover:bg-slate-900 rounded-lg transition-all cursor-pointer"
+              title="Sign Out"
+            >
+              <LogOut size={16} />
+            </button>
           </div>
         </div>
       </aside>
@@ -88,10 +109,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <span className="text-lg">🔓</span>
             <h1 className="font-extrabold text-sm text-white">LocksmithOS</h1>
           </div>
-          <nav className="flex items-center gap-3">
+          <nav className="flex items-center gap-4">
             <Link href="/dashboard" className="text-xs font-semibold text-slate-400 hover:text-white">Overview</Link>
             <Link href="/dashboard/leads" className="text-xs font-semibold text-slate-400 hover:text-white">Leads</Link>
-            <Link href="/dashboard/settings" className="text-xs font-semibold text-slate-400 hover:text-white">Settings</Link>
+            <button
+              onClick={handleLogout}
+              className="text-xs font-semibold text-rose-400 hover:text-rose-300 transition-all cursor-pointer"
+            >
+              Logout
+            </button>
           </nav>
         </header>
 

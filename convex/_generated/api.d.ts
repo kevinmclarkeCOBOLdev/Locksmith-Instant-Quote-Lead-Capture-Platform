@@ -15,6 +15,7 @@ import type * as notifications from "../notifications.js";
 import type * as quotes from "../quotes.js";
 import type * as seed from "../seed.js";
 import type * as tenants from "../tenants.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -30,6 +31,7 @@ declare const fullApi: ApiFromModules<{
   quotes: typeof quotes;
   seed: typeof seed;
   tenants: typeof tenants;
+  users: typeof users;
 }>;
 
 /**

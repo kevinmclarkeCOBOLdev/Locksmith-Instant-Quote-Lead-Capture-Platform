@@ -49,12 +49,14 @@ export const seedData = mutation({
     await ctx.db.insert('users', {
       tenantId,
       email: 'admin@atypikallocksmiths.co.uk',
-      authUserId: '11111111-1111-1111-1111-111111111111'
+      authUserId: '11111111-1111-1111-1111-111111111111',
+      password: 'MockPassword123!'
     });
     await ctx.db.insert('users', {
       tenantId,
       email: 'kevin.clarke@example.com',
-      authUserId: '22222222-2222-2222-2222-222222222222'
+      authUserId: '22222222-2222-2222-2222-222222222222',
+      password: 'MockPassword456!'
     });
 
     // 4. Create test leads & quotes

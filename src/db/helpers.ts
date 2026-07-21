@@ -82,7 +82,8 @@ export async function getOrCreateDefaultTenant() {
       await db.insert(users).values({
         id: '11111111-1111-1111-1111-111111111111', // Dummy user ID for dashboard demo login
         tenantId: DEFAULT_TENANT_ID,
-        email: 'admin@atypikallocksmiths.co.uk'
+        email: 'admin@atypikallocksmiths.co.uk',
+        password: 'MockPassword123!'
       });
     }
 
