@@ -9,7 +9,7 @@ import { z } from 'zod';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '@/../convex/_generated/api';
 
-const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+const convexUrl = process.env.CONVEX_URL || process.env.NEXT_PUBLIC_CONVEX_URL || process.env['NEXT_PUBLIC_CONVEX_URL'];
 const convex = convexUrl ? new ConvexHttpClient(convexUrl) : null;
 
 const notifySchema = z.object({

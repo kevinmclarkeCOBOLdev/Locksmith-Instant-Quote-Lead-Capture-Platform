@@ -6,7 +6,7 @@ import { DEFAULT_TENANT_ID } from '@/db/helpers';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '@/../convex/_generated/api';
 
-const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+const convexUrl = process.env.CONVEX_URL || process.env.NEXT_PUBLIC_CONVEX_URL || process.env['NEXT_PUBLIC_CONVEX_URL'];
 const convex = convexUrl ? new ConvexHttpClient(convexUrl) : null;
 
 export async function GET(req: Request) {

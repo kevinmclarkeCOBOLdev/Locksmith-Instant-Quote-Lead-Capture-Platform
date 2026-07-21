@@ -6,7 +6,7 @@ import { users } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { signJWT } from '@/services/auth';
 
-const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+const convexUrl = process.env.CONVEX_URL || process.env.NEXT_PUBLIC_CONVEX_URL || process.env['NEXT_PUBLIC_CONVEX_URL'];
 const convex = convexUrl ? new ConvexHttpClient(convexUrl) : null;
 
 export async function POST(req: Request) {
