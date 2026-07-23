@@ -4,11 +4,8 @@ import { eq } from 'drizzle-orm';
 import { getOrCreateDefaultTenant, DEFAULT_EMAIL_TEMPLATES, DEFAULT_SMS_TEMPLATES, DEFAULT_NOTIFICATION_SETTINGS } from '@/db/helpers';
 import { emailProvider } from '@/services/email';
 import { smsProvider } from '@/services/sms';
-import { ConvexHttpClient } from 'convex/browser';
+import { getConvexClient } from '@/lib/convex';
 import { api } from '@/../convex/_generated/api';
-
-const convexUrl = process.env.CONVEX_URL || process.env.NEXT_PUBLIC_CONVEX_URL || process.env['NEXT_PUBLIC_CONVEX_URL'];
-const convex = convexUrl ? new ConvexHttpClient(convexUrl) : null;
 
 export interface SendNotificationsParams {
   tenantId: string;
@@ -28,6 +25,7 @@ function renderTemplate(template: string, variables: Record<string, any>): strin
 
 export async function sendLeadNotifications(params: SendNotificationsParams) {
   const { tenantId, leadId, minPrice, maxPrice } = params;
+  const convex = getConvexClient();
 
   if (convex) {
     try {

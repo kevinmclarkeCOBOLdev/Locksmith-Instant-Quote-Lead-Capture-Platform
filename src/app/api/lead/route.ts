@@ -4,12 +4,9 @@ import { leads, quotes, auditLogs, tenants } from '@/db/schema';
 import { getOrCreateDefaultTenant, DEFAULT_QUOTE_RULES } from '@/db/helpers';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
-import { ConvexHttpClient } from 'convex/browser';
 import { api } from '@/../convex/_generated/api';
+import { getConvexClient } from '@/lib/convex';
 import { sendLeadNotifications } from '@/services/notificationService';
-
-const convexUrl = process.env.CONVEX_URL || process.env.NEXT_PUBLIC_CONVEX_URL || process.env['NEXT_PUBLIC_CONVEX_URL'];
-const convex = convexUrl ? new ConvexHttpClient(convexUrl) : null;
 
 const leadSchema = z.object({
   tenantId: z.string().optional(),
@@ -71,11 +68,14 @@ export async function POST(req: Request) {
     // 1. Geocode with timeout protection
     const { lat, lng } = await geocodePostcode(data.postcode);
 
+    const convex = getConvexClient();
+
     if (convex) {
       try {
+        console.log('[API /api/lead] Attempting Convex lead submission...');
         // 2. Fetch tenant & calculate quote
         const tenantData = await convex.mutation(api.tenants.getOrCreateDefaultTenant, {});
-        if (!tenantData) throw new Error('Tenant could not be initialized');
+        if (!tenantData) throw new Error('Tenant could not be initialized in Convex');
 
         const tid = (tenantData as any)._id;
         const quoteRules = (tenantData as any).quoteRules || DEFAULT_QUOTE_RULES;
@@ -130,8 +130,11 @@ export async function POST(req: Request) {
           console.error('Async notify triggers failed:', notifyErr);
         }
 
+        console.log('[API /api/lead] Lead and quote successfully saved in Convex:', newLeadId);
+
         return NextResponse.json({
           success: true,
+          engine: 'convex',
           lead: {
             id: newLeadId,
             tenantId: tid,
@@ -156,9 +159,11 @@ export async function POST(req: Request) {
             quoteType: 'instant',
           },
         });
-      } catch (convexErr) {
-        console.error('Convex operation failed, falling back to local DB:', convexErr);
+      } catch (convexErr: any) {
+        console.error('[API /api/lead] Convex operation failed, falling back to local DB:', convexErr);
       }
+    } else {
+      console.warn('[API /api/lead] No Convex URL environment variable detected. Using local fallback.');
     }
 
     // Local / Drizzle fallback
@@ -222,6 +227,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
+      engine: 'local_fallback',
       lead: newLead,
       quote: newQuote,
     });
