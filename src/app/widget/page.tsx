@@ -109,8 +109,14 @@ function WizardContent() {
         }),
       });
 
-      const data = await res.json();
-      if (!data.success) {
+      let data;
+      try {
+        data = await res.json();
+      } catch (jsonErr) {
+        throw new Error('Server error occurred while calculating estimate. Please try again.');
+      }
+
+      if (!res.ok || !data.success) {
         throw new Error(data.error || 'Failed to submit request');
       }
 
