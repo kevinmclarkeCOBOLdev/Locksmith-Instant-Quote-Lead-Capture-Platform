@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Phone, Mail, MapPin, Calendar, Clock, ArrowRight } from 'lucide-react';
+import { Phone, Mail, MapPin, Calendar, Clock } from 'lucide-react';
 
 interface Lead {
   id: string;
@@ -24,9 +24,9 @@ interface Lead {
 const COLUMNS: Array<{ id: Lead['status']; label: string; color: string }> = [
   { id: 'new', label: 'New Lead', color: 'border-t-blue-500 bg-blue-500/5' },
   { id: 'contacted', label: 'Contacted', color: 'border-t-purple-500 bg-purple-500/5' },
-  { id: 'quoted', label: 'Quoted', color: 'border-t-amber-500 bg-amber-500/5' },
-  { id: 'booked', label: 'Booked', color: 'border-t-indigo-500 bg-indigo-500/5' },
-  { id: 'completed', label: 'Completed', color: 'border-t-emerald-500 bg-emerald-500/5' },
+  { id: 'quoted', label: 'Quoted', color: 'border-t-emerald-500 bg-emerald-500/5' },
+  { id: 'booked', label: 'Booked', color: 'border-t-teal-500 bg-teal-500/5' },
+  { id: 'completed', label: 'Completed', color: 'border-t-emerald-400 bg-emerald-400/10' },
   { id: 'lost', label: 'Lost', color: 'border-t-rose-500 bg-rose-500/5' },
 ];
 
@@ -124,10 +124,10 @@ export default function KanbanBoard() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="h-10 w-48 bg-slate-900 rounded-lg animate-pulse"></div>
+        <div className="h-10 w-48 bg-[#1a1a1a] light:bg-slate-200 rounded-lg animate-pulse"></div>
         <div className="grid grid-cols-6 gap-4 h-[75vh]">
           {[1, 2, 3, 4, 5, 6].map(i => (
-            <div key={i} className="bg-slate-900/40 rounded-2xl border border-slate-900 h-full animate-pulse"></div>
+            <div key={i} className="bg-[#1a1a1a] light:bg-slate-200 rounded-2xl border border-[#383838] light:border-slate-200 h-full animate-pulse"></div>
           ))}
         </div>
       </div>
@@ -138,8 +138,8 @@ export default function KanbanBoard() {
     <div className="space-y-8 flex flex-col h-[88vh]">
       {/* Header */}
       <div className="shrink-0">
-        <h2 className="text-3xl font-extrabold tracking-tight text-white">Lead Pipeline</h2>
-        <p className="text-sm text-slate-400 mt-1">Drag and drop leads to update status in real-time.</p>
+        <h2 className="text-3xl font-extrabold tracking-tight text-white light:text-slate-900">Lead Pipeline</h2>
+        <p className="text-sm text-neutral-400 light:text-slate-500 mt-1">Drag and drop leads to update status in real-time.</p>
       </div>
 
       {/* Board Columns container */}
@@ -152,13 +152,13 @@ export default function KanbanBoard() {
               key={col.id}
               onDragOver={handleDragOver}
               onDrop={e => handleDrop(e, col.id)}
-              className={`w-80 shrink-0 border-t-4 border border-slate-900 rounded-2xl flex flex-col max-h-full ${col.color}`}
+              className={`w-80 shrink-0 border-t-4 border border-[#383838] light:border-slate-200 bg-[#1a1a1a] light:bg-white rounded-2xl flex flex-col max-h-full ${col.color}`}
             >
               {/* Column Header */}
-              <div className="p-4 border-b border-slate-900/60 flex items-center justify-between shrink-0">
-                <span className="text-sm font-bold text-white flex items-center gap-2">
+              <div className="p-4 border-b border-[#383838] light:border-slate-200 flex items-center justify-between shrink-0">
+                <span className="text-sm font-bold text-white light:text-slate-900 flex items-center gap-2">
                   {col.label}
-                  <span className="text-xs bg-slate-800 border border-slate-700/60 text-slate-400 px-2 py-0.5 rounded-full">
+                  <span className="text-xs bg-[#282828] light:bg-slate-100 border border-[#383838] light:border-slate-200 text-neutral-300 light:text-slate-600 px-2 py-0.5 rounded-full">
                     {colLeads.length}
                   </span>
                 </span>
@@ -167,16 +167,16 @@ export default function KanbanBoard() {
               {/* Cards list */}
               <div className="flex-1 overflow-y-auto p-3 space-y-3 min-h-[150px]">
                 {colLeads.length === 0 ? (
-                  <div className="h-full flex items-center justify-center text-xs text-slate-500 italic py-10">
+                  <div className="h-full flex items-center justify-center text-xs text-neutral-500 light:text-slate-400 italic py-10">
                     No leads here
                   </div>
                 ) : (
                   colLeads.map(lead => {
                     const isUpdating = updatingId === lead.id;
                     const urgencyColors = {
-                      Emergency: 'bg-red-500/10 text-red-400 border-red-500/20',
-                      'Same Day': 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-                      Flexible: 'bg-slate-800 text-slate-400 border-slate-700/40',
+                      Emergency: 'bg-red-500/15 text-red-400 border-red-500/30',
+                      'Same Day': 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+                      Flexible: 'bg-[#282828] text-neutral-400 border-[#383838]',
                     };
                     const urgencyColor = urgencyColors[lead.urgency as keyof typeof urgencyColors] || urgencyColors.Flexible;
 
@@ -185,13 +185,13 @@ export default function KanbanBoard() {
                         key={lead.id}
                         draggable
                         onDragStart={e => handleDragStart(e, lead.id)}
-                        className={`bg-slate-900 border border-slate-900 rounded-xl p-4 space-y-3 cursor-grab active:cursor-grabbing hover:border-slate-800 transition-all duration-200 relative group ${
+                        className={`bg-[#282828] light:bg-slate-50 border border-[#383838] light:border-slate-200 rounded-xl p-4 space-y-3 cursor-grab active:cursor-grabbing hover:border-emerald-500/50 transition-all duration-200 relative group shadow-sm ${
                           isUpdating ? 'opacity-50' : ''
                         }`}
                       >
                         {/* Service Type + Urgency */}
                         <div className="flex justify-between items-start">
-                          <span className="text-xs font-bold text-white leading-tight">
+                          <span className="text-xs font-bold text-white light:text-slate-900 leading-tight">
                             {lead.serviceType}
                           </span>
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${urgencyColor}`}>
@@ -201,48 +201,48 @@ export default function KanbanBoard() {
 
                         {/* Customer Name */}
                         <div>
-                          <h4 className="font-extrabold text-sm text-slate-200 group-hover:text-amber-500 transition-colors">
+                          <h4 className="font-extrabold text-sm text-neutral-200 light:text-slate-800 group-hover:text-emerald-400 transition-colors">
                             {lead.name}
                           </h4>
-                          <span className="text-[10px] text-slate-500 flex items-center gap-1 mt-0.5">
+                          <span className="text-[10px] text-neutral-400 light:text-slate-500 flex items-center gap-1 mt-0.5">
                             <Clock size={10} /> {new Date(lead.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                           </span>
                         </div>
 
                         {/* Contact details */}
-                        <div className="space-y-1 text-xs text-slate-400">
-                          <a href={`tel:${lead.phone}`} className="flex items-center gap-2 hover:text-white transition-colors">
-                            <Phone size={12} className="text-slate-500" /> {lead.phone}
+                        <div className="space-y-1 text-xs text-neutral-400 light:text-slate-600">
+                          <a href={`tel:${lead.phone}`} className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
+                            <Phone size={12} className="text-neutral-500" /> {lead.phone}
                           </a>
-                          <a href={`mailto:${lead.email}`} className="flex items-center gap-2 hover:text-white transition-colors">
-                            <Mail size={12} className="text-slate-500 animate-pulse" />
+                          <a href={`mailto:${lead.email}`} className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
+                            <Mail size={12} className="text-neutral-500 animate-pulse" />
                             <span className="truncate max-w-[170px]">{lead.email}</span>
                           </a>
                           <div className="flex items-center gap-2">
-                            <MapPin size={12} className="text-slate-500" />
+                            <MapPin size={12} className="text-neutral-500" />
                             <span className="uppercase">{lead.postcode}</span>
                           </div>
                         </div>
 
                         {/* Pricing details if quote exists */}
                         {lead.quote && (
-                          <div className="border-t border-slate-900 pt-2.5 flex justify-between items-center text-xs">
-                            <span className="text-[10px] text-slate-500 font-semibold uppercase">Estimate</span>
-                            <span className="font-extrabold text-amber-400">
+                          <div className="border-t border-[#383838] light:border-slate-200 pt-2.5 flex justify-between items-center text-xs">
+                            <span className="text-[10px] text-neutral-400 light:text-slate-500 font-semibold uppercase">Estimate</span>
+                            <span className="font-extrabold text-emerald-400 light:text-emerald-600">
                               £{lead.quote.minPrice} - £{lead.quote.maxPrice}
                             </span>
                           </div>
                         )}
 
-                        {/* Mobile action button controls (Manual moves overlay in card) */}
-                        <div className="absolute top-2 right-2 hidden group-hover:flex items-center gap-1 bg-slate-900/90 pl-2 rounded-lg py-1 border border-slate-800">
-                          <span className="text-[10px] text-slate-500 mr-1">Move:</span>
+                        {/* Mobile action button controls */}
+                        <div className="absolute top-2 right-2 hidden group-hover:flex items-center gap-1 bg-[#1a1a1a]/95 light:bg-white pl-2 rounded-lg py-1 border border-[#383838] light:border-slate-200 shadow-md">
+                          <span className="text-[10px] text-neutral-400 mr-1">Move:</span>
                           {COLUMNS.filter(c => c.id !== lead.status).map(colItem => (
                             <button
                               key={colItem.id}
                               onClick={() => moveLeadStatus(lead.id, colItem.id)}
                               title={`Move to ${colItem.label}`}
-                              className="w-4 h-4 rounded-full border border-slate-700 hover:border-amber-500 flex items-center justify-center text-[9px] text-slate-400 hover:text-white"
+                              className="w-4 h-4 rounded-full border border-[#383838] hover:border-emerald-500 flex items-center justify-center text-[9px] text-neutral-400 hover:text-white"
                             >
                               {colItem.label.substring(0, 1)}
                             </button>

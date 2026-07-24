@@ -40,17 +40,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/10 via-[#020617] to-[#020617] flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen bg-[#222222] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-500/10 via-[#222222] to-[#222222] flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
       {/* Brand Header */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-4">
-        <div className="mx-auto h-12 w-12 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.15)] animate-pulse">
+        <div className="mx-auto h-12 w-12 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.15)] animate-pulse">
           <Shield size={24} />
         </div>
         <div>
           <h2 className="text-3xl font-extrabold tracking-tight text-white">
-            LocksmithOS
+            Atypikal LocksmithOS
           </h2>
-          <p className="mt-1.5 text-sm text-slate-400">
+          <p className="mt-1.5 text-sm text-neutral-400">
             Secure Management & Lead Control Platform
           </p>
         </div>
@@ -58,10 +58,10 @@ export default function LoginPage() {
 
       {/* Login Card */}
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
-        <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800/80 rounded-2xl shadow-2xl p-8 space-y-6">
+        <div className="bg-[#1a1a1a] backdrop-blur-md border border-[#383838] rounded-2xl shadow-2xl p-8 space-y-6">
           <div className="space-y-1">
             <h3 className="text-xl font-bold text-white">Sign In</h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-neutral-400">
               Access your business dashboard and live instant quotes.
             </p>
           </div>
@@ -76,11 +76,11 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Field */}
             <div className="space-y-1.5">
-              <label htmlFor="email" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              <label htmlFor="email" className="text-xs font-semibold text-neutral-300 uppercase tracking-wider">
                 Email Address
               </label>
               <div className="relative rounded-lg shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-500">
                   <Mail size={16} />
                 </div>
                 <input
@@ -90,18 +90,18 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@atypikallocksmiths.co.uk"
-                  className="block w-full pl-10 pr-4 py-2.5 bg-slate-950/50 border border-slate-800 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                  className="block w-full pl-10 pr-4 py-2.5 bg-[#282828] border border-[#383838] rounded-lg text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
                 />
               </div>
             </div>
 
             {/* Password Field */}
             <div className="space-y-1.5">
-              <label htmlFor="password" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              <label htmlFor="password" className="text-xs font-semibold text-neutral-300 uppercase tracking-wider">
                 Password
               </label>
               <div className="relative rounded-lg shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-500">
                   <Lock size={16} />
                 </div>
                 <input
@@ -111,7 +111,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="block w-full pl-10 pr-4 py-2.5 bg-slate-950/50 border border-slate-800 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                  className="block w-full pl-10 pr-4 py-2.5 bg-[#282828] border border-[#383838] rounded-lg text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
                 />
               </div>
             </div>
@@ -120,7 +120,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 text-sm font-bold shadow-lg hover:shadow-amber-500/10 transition-all duration-200 cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 text-sm font-bold shadow-lg hover:shadow-emerald-500/20 transition-all duration-200 cursor-pointer"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></div>
@@ -134,11 +134,11 @@ export default function LoginPage() {
           </form>
 
           {/* Seed helper hint */}
-          <div className="pt-2 border-t border-slate-800/60 text-center">
-            <span className="text-[10px] text-slate-500 uppercase tracking-wider block">
+          <div className="pt-2 border-t border-[#383838] text-center">
+            <span className="text-[10px] text-neutral-500 uppercase tracking-wider block">
               Local Test Credentials:
             </span>
-            <code className="text-[11px] text-amber-500/80 block mt-1 select-all">
+            <code className="text-[11px] text-emerald-400 block mt-1 select-all">
               admin@atypikallocksmiths.co.uk / MockPassword123!
             </code>
           </div>
