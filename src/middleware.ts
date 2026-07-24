@@ -9,20 +9,10 @@ export async function middleware(request: NextRequest) {
   // Verify the JWT token
   const session = sessionToken ? await verifyJWT(sessionToken) : null;
 
-  // Route protection
-  const isDashboardPath = pathname.startsWith('/dashboard');
-  const isLoginPath = pathname === '/login';
-
-  if (isDashboardPath && !session) {
-    // Redirect to login if trying to access dashboard while unauthenticated
-    const loginUrl = new URL('/login', request.url);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  if (isLoginPath && session) {
-    // Redirect to dashboard if trying to access login while already authenticated
-    const dashboardUrl = new URL('/dashboard', request.url);
-    return NextResponse.redirect(dashboardUrl);
+  // Route protection: If unauthenticated user tries to access /dashboard directly, redirect to home page with login modal prompt
+  if (pathname.startsWith('/dashboard') && !session) {
+    const homeUrl = new URL('/?login=true', request.url);
+    return NextResponse.redirect(homeUrl);
   }
 
   // Pass user and tenant context to downstream headers if authenticated
@@ -35,7 +25,6 @@ export async function middleware(request: NextRequest) {
   return response;
 }
 
-// Match only dashboard routes and the login route
 export const config = {
-  matcher: ['/dashboard/:path*', '/login'],
+  matcher: ['/dashboard/:path*'],
 };

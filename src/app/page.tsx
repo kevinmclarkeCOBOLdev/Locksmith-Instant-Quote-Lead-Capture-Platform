@@ -1,14 +1,31 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Sparkles, Code2, ShieldAlert, Monitor, ChevronRight, LayoutDashboard } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { ArrowRight, Sparkles, Code2, ShieldAlert, Monitor, ChevronRight, LogIn } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeProvider';
+import { LoginModal } from '@/components/LoginModal';
 
-export default function LandingPage() {
+function LandingPageContent() {
+  const searchParams = useSearchParams();
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get('login') === 'true') {
+      setIsLoginOpen(true);
+    }
+  }, [searchParams]);
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#222222] text-slate-900 dark:text-neutral-100 font-sans selection:bg-emerald-500/30 selection:text-emerald-600 dark:selection:text-emerald-300 transition-colors duration-200">
       
+      {/* Login Modal Popup */}
+      <LoginModal 
+        isOpen={isLoginOpen} 
+        onClose={() => setIsLoginOpen(false)} 
+      />
+
       {/* Background radial effects */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute bottom-10 right-1/4 w-[600px] h-[600px] bg-emerald-600/5 rounded-full blur-[150px] pointer-events-none" />
@@ -29,13 +46,14 @@ export default function LandingPage() {
           {/* Small button to toggle between dark and light modes */}
           <ThemeToggle />
 
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-2 bg-slate-200 dark:bg-[#2a2a2a] hover:bg-slate-300 dark:hover:bg-[#333333] border border-slate-300 dark:border-[#3d3d3d] text-slate-900 dark:text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition-all duration-200"
+          <button
+            onClick={() => setIsLoginOpen(true)}
+            type="button"
+            className="flex items-center gap-2 bg-slate-200 dark:bg-[#2a2a2a] hover:bg-slate-300 dark:hover:bg-[#333333] border border-slate-300 dark:border-[#3d3d3d] text-slate-900 dark:text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition-all duration-200 cursor-pointer"
           >
-            <LayoutDashboard size={14} className="text-emerald-600 dark:text-emerald-400" />
-            <span>Dashboard</span>
-          </Link>
+            <LogIn size={14} className="text-emerald-600 dark:text-emerald-400" />
+            <span>Admin Sign In</span>
+          </button>
 
           <Link
             href="/widget"
@@ -63,12 +81,13 @@ export default function LandingPage() {
 
         {/* Hero CTAs */}
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-          <Link
-            href="/dashboard"
+          <button
+            onClick={() => setIsLoginOpen(true)}
+            type="button"
             className="w-full sm:w-auto bg-emerald-600 dark:bg-emerald-500 hover:bg-emerald-700 dark:hover:bg-emerald-600 text-white dark:text-slate-950 font-bold px-8 py-4 rounded-xl shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2 group transition-all duration-200 cursor-pointer"
           >
             Open Management Dashboard <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-          </Link>
+          </button>
           <Link
             href="/widget"
             className="w-full sm:w-auto bg-white dark:bg-[#1a1a1a] border border-slate-300 dark:border-[#383838] hover:border-emerald-500/50 text-slate-800 dark:text-neutral-200 font-semibold px-8 py-4 rounded-xl flex items-center justify-center gap-2 transition-all duration-200"
@@ -177,14 +196,38 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-slate-200 dark:border-[#383838] bg-slate-100 dark:bg-[#1a1a1a] py-8 relative z-10">
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-neutral-400 gap-4">
-          <p>© {new Date().getFullYear()} Atypikal Studio. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()}{' '}
+            <a
+              href="https://atypikalstudio.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-emerald-600 dark:hover:text-emerald-400 underline transition-colors font-medium"
+            >
+              Atypikal Studio
+            </a>
+            . All rights reserved.
+          </p>
           <div className="flex items-center gap-6">
-            <Link href="/dashboard" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Admin Dashboard</Link>
+            <button 
+              onClick={() => setIsLoginOpen(true)} 
+              className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer"
+            >
+              Admin Sign In
+            </button>
             <Link href="/widget" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Widget Test</Link>
           </div>
         </div>
       </footer>
 
     </div>
+  );
+}
+
+export default function LandingPage() {
+  return (
+    <Suspense fallback={null}>
+      <LandingPageContent />
+    </Suspense>
   );
 }
