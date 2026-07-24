@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { X } from 'lucide-react';
 
 const DEFAULT_TENANT_ID = '00000000-0000-0000-0000-000000000000';
 
@@ -31,6 +32,7 @@ const URGENCY_LEVELS = [
 ];
 
 function WizardContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const tenantId = searchParams.get('tenant') || DEFAULT_TENANT_ID;
 
@@ -79,6 +81,10 @@ function WizardContent() {
   const handleBack = () => {
     setError('');
     setStep(prev => prev - 1);
+  };
+
+  const handleClose = () => {
+    router.push('/dashboard');
   };
 
   const handleSubmitLead = async (e: React.FormEvent) => {
@@ -136,7 +142,7 @@ function WizardContent() {
 
   return (
     <div className="min-h-screen bg-[#222222] text-[#f4f4f5] flex items-center justify-center p-4">
-      <div className="w-full max-w-lg bg-[#1a1a1a] border border-[#383838] rounded-2xl shadow-2xl overflow-hidden transition-all duration-300">
+      <div className="w-full max-w-lg bg-[#1a1a1a] border border-[#383838] rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 relative">
         
         {/* Header */}
         <div className="p-6 border-b border-[#383838] bg-[#141414]">
@@ -144,9 +150,21 @@ function WizardContent() {
             <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
               Instant Quote Wizard
             </span>
-            <span className="text-xs text-neutral-400 font-medium">
-              Step {step} of 6
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-neutral-400 font-medium">
+                Step {step} of 6
+              </span>
+              {/* Close Button */}
+              <button
+                onClick={handleClose}
+                type="button"
+                aria-label="Close wizard"
+                title="Close wizard and return to dashboard"
+                className="p-1 rounded-lg text-neutral-400 hover:text-white hover:bg-[#282828] transition-colors cursor-pointer flex items-center justify-center"
+              >
+                <X size={18} />
+              </button>
+            </div>
           </div>
           {/* Progress bar */}
           <div className="w-full bg-[#282828] h-1.5 rounded-full overflow-hidden">
