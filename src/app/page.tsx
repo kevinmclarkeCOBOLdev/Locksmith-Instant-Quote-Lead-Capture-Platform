@@ -20,7 +20,7 @@ export default function LandingPage() {
             🔓
           </div>
           <div>
-            <h1 className="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white leading-tight">Atypikal LocksmithOS</h1>
+            <h1 className="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white leading-tight">Atypikal LockQuote</h1>
             <span className="text-[10px] text-emerald-600 dark:text-emerald-400 uppercase tracking-widest font-bold block">Lead Capture Platform</span>
           </div>
         </div>

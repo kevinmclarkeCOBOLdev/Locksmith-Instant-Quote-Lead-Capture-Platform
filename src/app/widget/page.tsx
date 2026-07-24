@@ -84,7 +84,7 @@ function WizardContent() {
   };
 
   const handleClose = () => {
-    router.push('/dashboard');
+    router.push('/');
   };
 
   const handleSubmitLead = async (e: React.FormEvent) => {
@@ -159,7 +159,7 @@ function WizardContent() {
                 onClick={handleClose}
                 type="button"
                 aria-label="Close wizard"
-                title="Close wizard and return to dashboard"
+                title="Close wizard and return home"
                 className="p-1 rounded-lg text-neutral-400 hover:text-white hover:bg-[#282828] transition-colors cursor-pointer flex items-center justify-center"
               >
                 <X size={18} />

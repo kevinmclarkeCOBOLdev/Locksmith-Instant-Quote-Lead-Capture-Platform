@@ -64,7 +64,7 @@ export default function DashboardOverview() {
       {/* Title */}
       <div>
         <h2 className="text-3xl font-extrabold tracking-tight text-white light:text-slate-900">Dashboard Overview</h2>
-        <p className="text-sm text-neutral-400 light:text-slate-500 mt-1">Real-time quote and lead activity metrics for Atypikal Studio LocksmithOS.</p>
+        <p className="text-sm text-neutral-400 light:text-slate-500 mt-1">Real-time quote and lead activity metrics for Atypikal Studio LockQuote.</p>
       </div>
 
       {/* Metrics Grid */}

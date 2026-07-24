@@ -55,7 +55,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               🔓
             </div>
             <div>
-              <h1 className="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white">LocksmithOS</h1>
+              <h1 className="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white">LockQuote</h1>
               <span className="text-[10px] text-emerald-600 dark:text-emerald-400 uppercase tracking-widest font-bold">Atypikal Studio</span>
             </div>
           </div>
@@ -113,7 +113,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <header className="md:hidden h-16 border-b border-slate-200 dark:border-[#383838] bg-white dark:bg-[#1a1a1a] flex items-center justify-between px-6 shrink-0">
           <div className="flex items-center gap-3">
             <span className="text-lg">🔓</span>
-            <h1 className="font-extrabold text-sm text-slate-900 dark:text-white">Atypikal LocksmithOS</h1>
+            <h1 className="font-extrabold text-sm text-slate-900 dark:text-white">Atypikal LockQuote</h1>
           </div>
           <nav className="flex items-center gap-3">
             <ThemeToggle />

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Atypikal LocksmithOS | Instant Quote & Lead Capture Platform",
+  title: "Atypikal LockQuote | Instant Quote & Lead Capture Platform",
   description: "Atypikal Studio multi-tenant lead generation SaaS platform for locksmith businesses.",
 };
 

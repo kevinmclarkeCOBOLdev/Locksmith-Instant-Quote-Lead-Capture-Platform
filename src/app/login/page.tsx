@@ -48,7 +48,7 @@ export default function LoginPage() {
         </div>
         <div>
           <h2 className="text-3xl font-extrabold tracking-tight text-white">
-            Atypikal LocksmithOS
+            Atypikal LockQuote
           </h2>
           <p className="mt-1.5 text-sm text-neutral-400">
             Secure Management & Lead Control Platform
